@@ -24,13 +24,15 @@ As a result we have a pair `(Tx, [TxInWitness])`, where:
 
 ## Witness Structure
 
-Witness is a pair `(PublicKey, Signature (Hash Tx))`, where:
+The exact binary structure of a witness is out of scope for this document. Conceptually,
+a witness is a pair `(PublicKey, Signature (Hash Tx))`, where:
 
 * `Tx` is a new transaction,
 * `Hash Tx` is a BLAKE2b-256 hash of `Tx`,
 * `PublicKey` is a public key of the creator of `Tx`,
 * `Signature` is a signature of the hash of `Tx` (Ed25519-based signature system is used).
-  Secret key corresponding to `PublicKey` is using for signing.
+
+The secret key corresponding to `PublicKey` is used for signing.
 
 ## Example
 

@@ -83,9 +83,9 @@ Each input corresponds to the output of some previous transaction, so input cont
 ```
 [
     0,                                                      # InType
-    [                                                       # This is CBOR data item containing a list inside.
-        h'BB57EF4DDC170EFAE1B1...FD42A498664BB6E7F1B5',     # TxId
-        28491                                               # TxOutputIndex
+    [                                                       # A CBOR data item containing a list inside:
+        h'BB57EF4DDC170EFAE1B1...FD42A498664BB6E7F1B5',         # TxId
+        28491                                                   # TxOutputIndex
     ]
 ]
 ```
@@ -104,6 +104,11 @@ Identifier of previous transaction `T` is a hash of `T`. It is BLACK2b-256 hash,
 so its length is 32 bytes.
 
 Index of corresponding output in `T` is an integer (the value between `0` and `2^32 - 1`).
+
+The format of CBOR data items is described [here][CBOR data item]. In the case above, the list
+will be CBOR-encoded as a bytestring and prefixed with tag 24.
+
+[CBOR data item]: https://tools.ietf.org/html/rfc7049#section-2.4.4.1
 
 ## Transaction Outputs
 
@@ -139,13 +144,13 @@ Recipient's address is a list:
 
 ```
 [
-    [
-        h'C61F822357B7F4A48CB9...A7C602C4A7856A6',       # Root
-        {                                                # Attributes
-            0: h'8200581CFC310...F678BD553206AC4',           # StakeDistribution
-            1: h'49EB93EC6B3A6205311D'                       # PkDerivationPath
+    [                                                    # Address (as CBOR data item)
+        h'C61F822357B7F4A48CB9...A7C602C4A7856A6',           # Root
+        {                                                    # Attributes
+            0: h'8200581CFC310...F678BD553206AC4',               # StakeDistribution
+            1: h'49EB93EC6B3A6205311D'                           # PkDerivationPath
         },
-        0                                                # AddrType
+        0                                                    # AddrType
     ],
     3948132476                                           # Checksum
 ]
@@ -159,17 +164,20 @@ where:
 * `Checksum` - CRC32 checksum of an address.
 
 Please note that address may contain other attributes (i.e. with other keys, not only `0` and `1`).
-When a certain attribute isn't specified, there will be a default value.
+When a certain attribute isn't specified, the default value for that attribute should be used
+(the default values are specified in one of the further sections).
+
+As with inputs, addresses are CBOR data items (a bytestring prefixed with tag 24).
 
 #### Address Root
 
 Address root is a root of imaginary pseudo Merkle tree stored in this address.
 Actually it is a hash used to identify the address. Technically it is BLACK2b-224 hash,
-so its length is 28 byte.
+so its length is 28 bytes.
 
 #### Address Attributes
 
-Technically attributes is a map, where `key` is a byte, and `value` is a value
+Technically attributes is a map, where `key` is an integer from 0 to 255, and `value` is a value
 of arbitrary type.
 
 Currently address attributes have two keys:
@@ -199,7 +207,7 @@ Supported types of an address are:
 * `2` - `Redeem`-address,
 * other tag - unknown address (for new types in future releases).
 
-Address type is a byte.
+Address type is, again, an integer from 0 to 255.
 
 ## Transaction Attributes
 
@@ -207,8 +215,8 @@ As mentioned before, attributes is a map, where `key` is 1-byte integer, and `va
 value of arbitrary type.
 
 Please note that currently transactions with non-empty attributes are prohibited, and
-Daedalus wallet always generates and receives transactions with **empty** attributes. But
-in future it might change and probably transactions will have the real attributes.
+the Daedalus wallet always generates and receives transactions with **empty** attributes.
+But in the future it might change and transactions will likely have real attributes.
 
 ## Full Example
 
